@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f5f2">
+  <meta name="description" content="A thoughtful workspace for KV-cache research. Explore entropy-weighted GQA page selection, plan memory budgets, and export reproducible experiments.">
+  <meta property="og:title" content="Page EntroKV — Make room for what matters.">
+  <meta property="og:description" content="The open research workspace for GQA-aware KV-cache analysis.">
+  <title>Page EntroKV — Research Workspace</title>
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./legibility.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="app"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="search-dialog" class="search-dialog" aria-labelledby="search-title">
+    <form method="dialog" class="search-top"><label id="search-title" for="global-search">Find your way</label><button class="icon-button" aria-label="Close search">✕</button></form>
+    <input id="global-search" type="search" placeholder="Search tools, methods, documentation…" autocomplete="off">
+    <div id="search-results"></div><div class="search-foot">Navigate the workspace <kbd>esc</kbd> to close</div>
+  </dialog>
+  <dialog id="detail-dialog" class="detail-dialog" aria-labelledby="detail-title"><div id="detail-content"></div></dialog>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

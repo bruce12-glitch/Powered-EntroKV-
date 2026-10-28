@@ -1,0 +1,12 @@
+{
+  "name": "page-entrokv-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A reproducible, browser-local workspace for GQA-aware KV-cache research.",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "start": "python3 -m http.server 8080 --directory dist"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,50 @@
+/* Strong text on quiet surfaces. AA contrast for numerical outputs and tool labels. */
+@layer legibility {
+  @media(max-width:720px){.sidebar{visibility:hidden}.sidebar-open .sidebar{visibility:visible}}
+  @media(max-width:520px){.hero h1{font-size:clamp(36px,11vw,48px)}.hero-copy{padding-inline:23px}}
+  .invalid-estimate{padding:35px}.invalid-estimate h2{margin:22px 0 12px}.invalid-estimate p{font-size:12px;margin-top:10px}
+  .eyebrow,.overview-intro .eyebrow,.page-heading .eyebrow,.nav-caption,.crumb-root,.section-title>span,.intro-links a,.brand small,.sidebar-search,.sidebar-search kbd,.nav-new,.workspace-label small,.local-user small,.top-docs,.preview-badge,.app-footer{color:#746f66}
+  .field-help,.range-labels,.switch-row small,.config-footer,.metric-card>span:first-child,.metric-bottom,.map-meta,.map-note,.map-legend,.table-foot,.provenance-line,.group-select,.source-details>span,.page-heading p,.notebook-note,.notebook-bottom>div,.empty-privacy,.formula-card p,.formula-values code,.formula-values>span{color:#746b5e}
+  .card-heading p,.preview-legend,.preview-legend>strong,.micro-note,.mini-toolbar,.source-badge,.open-banner p,.open-banner h3,.open-banner .button{color:#776c5c}
+  .hero-label,.hero-footnote,.hero-copy>p,.hero-footnote .icon,.art-note,.art-label{color:#766854}
+  .tile-number,.start-card>p,.tile-tags>span{color:#756082}
+  .peach .tile-number,.peach>p,.peach .tile-tags>span{color:#805b3d}
+  .mint .tile-number,.mint>p,.mint .tile-tags>span{color:#53664a}
+  .research-note>.eyebrow,.research-note h2,.research-note p,.research-note .text-link,.research-note>span:last-child{color:#7e6845}
+  .method-tab{color:#756a5a}.method-tab.selected{color:#6b5286;border-color:#8d70b5}
+  .metric-card>strong small{color:#82718f}.metric-bottom.green{color:#326b45}
+  .precision-strip,.precision-strip strong,.precision-strip>a,.head-id,.source-link,.source-card p,.source-card>div,.tag.lavender-tag,.docs-nav>a.selected,.doc-content code,.doc-callout{color:#6b5286}
+  .precision-strip>.icon{color:#806a9a}
+  .page-cell{color:#766854}.page-cell.retained{background:#7960a7;border-color:#7960a7;color:white}.page-cell.retained:before{opacity:calc(var(--strength) * .1)}
+  .legend-square.kept,.preview-page.kept{background:#9376bf;border-color:#9376bf}
+  .memory-result>.eyebrow,.memory-big,.memory-big>span,.memory-delta,.memory-delta>span:first-child,.memory-bar-label,.memory-bottom small,.memory-bottom strong,.memory-bottom strong>span,.formula,.method-sketch>div,.method-sketch>div span{color:#6b5286}
+  .assumption-card,.assumption-card strong,.assumption-card p,.research-hero .eyebrow,.research-hero h2,.research-hero p,.research-author,.research-pair h2,.research-pair p,.research-list,.evidence-table td:first-child,.evidence-table td:last-child,.notebook-bottom strong,.doc-content h2,.doc-content h3,.doc-content p,.doc-content li,.doc-steps strong,.docs-nav>a{color:#776144}
+  .research-pair .text-link,.citation-card .eyebrow,.citation-card h3,.citation-card p,.citation-card>.button,.doc-steps>li:before,.empty-notebook>.eyebrow{color:#755589}
+  .empty-notebook h2,.empty-notebook>p,.experiment-name small{color:#776144}
+  .notebook-active,.notebook-active .nav-count,.experiment-name{color:#755589}
+  .notebook-bottom .text-link,.doc-content .text-link{color:#0067c5}
+  .metric-card>span:first-child{font-size:11px;min-height:33px;line-height:1.6}
+  .metric-bottom{font-size:9px;white-space:normal;min-height:28px;line-height:1.7}
+  .configuration .field-help{font-size:11px;line-height:1.8}.source-details>span{font-size:9px}
+  .configuration label{font-size:12px}.switch-row strong{font-size:11px}.switch-row small{font-size:10px}
+  .config-footer{font-size:9px}.range-labels{font-size:10px}.map-meta{font-size:11px}.map-meta>span:last-child{font-size:10px}
+  .method-tab{font-size:11px;min-height:44px}.page-cell>span{font-size:9px}.map-legend{font-size:10px;flex-wrap:wrap}
+  .map-note,.table-foot{font-size:10px;line-height:1.8}.provenance-line{font-size:10px}
+  th{color:#746b5e;font-size:11px}td{font-size:12px}.head-id{font-size:11px}
+  .head-table table td{padding-block:12px}.head-table .card-heading p{font-size:11px}
+  .card-heading p{font-size:12px}.start-card>p{font-size:12px}.tile-tags>span{font-size:9px}
+  .hero-copy>p{font-size:14px}.hero-footnote{font-size:9px}.nav-item{font-size:13px}.local-user{font-size:10px}
+  .button{font-size:12px}.precision-strip{font-size:11px}.precision-strip>a{font-size:10px}
+  .planner-form .field-help,.formula-card p{font-size:11px}.formula-values>span{font-size:10px}.formula-values code{font-size:10px}
+  .assumption-card p{font-size:11px}.assumption-card strong{font-size:12px}
+  .memory-bar-label{font-size:12px}.memory-big>span{font-size:12px}.memory-delta{font-size:11px}.memory-bottom small{font-size:11px}
+  .research-hero p,.research-pair p,.research-list{font-size:12px}.research-author{font-size:10px}.evidence-table td{font-size:12px}
+  .citation-card p,.notebook-bottom>div{font-size:11px}.docs-nav>a{font-size:12px}
+  .doc-content p,.doc-content li{font-size:14px;line-height:1.95}.doc-content code{font-size:12px}.doc-content table td{font-size:12px}
+  .source-badge{font-size:9px}.micro-note{font-size:10px}.preview-legend{font-size:9px}.preview-legend>strong{font-size:9px}
+  .research-note p{font-size:12px}.research-note .text-link{font-size:11px}.research-note>span:last-child{font-size:10px}
+  .open-banner h3{font-size:14px}.open-banner p{font-size:11px}.app-footer{font-size:10px}.empty-privacy{font-size:10px}
+  @media(max-width:1190px){.metric-card>span:first-child{font-size:10px;min-height:33px}.metric-bottom{font-size:8px}.hero-copy>p{font-size:12px}.start-card>p{font-size:11px}.tile-tags>span{font-size:8px}.method-tab{font-size:10px}.source-badge{font-size:8px}.micro-note{font-size:9px}}
+  @media(max-width:980px){.hero-copy>p{font-size:11px}.hero-footnote{font-size:7px}.start-card>p{font-size:10px}.tile-tags>span{font-size:7px}.preview-legend{font-size:8px}.preview-legend>strong{font-size:8px}.research-note p{font-size:10px}.research-note .text-link{font-size:9px}.research-note>span:last-child{font-size:8px}.micro-note{font-size:8px}.nav-item{font-size:12px}}
+  @media(max-width:520px){.hero-copy>p{font-size:12px}.hero-footnote{font-size:8px}.start-card>p{font-size:12px}.tile-tags>span{font-size:9px}.research-note p{font-size:12px}.research-note .text-link{font-size:11px}.research-note>span:last-child{font-size:10px}.metric-card>span:first-child{font-size:9px;min-height:35px}.metric-bottom{font-size:8px}.metric-card>strong small{font-size:11px}.map-meta{font-size:10px}.map-meta>span:last-child{font-size:9px}.method-tabs{gap:15px}.method-tab{font-size:10px}.map-legend{font-size:10px}.legend-hint{font-size:9px}.configuration .field-help{font-size:11px}.source-badge{font-size:8px}.preview-legend{font-size:9px}.preview-legend>strong{font-size:9px}.micro-note{font-size:9px}.doc-content p,.doc-content li{font-size:13px}}
+}
