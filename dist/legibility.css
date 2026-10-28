@@ -1,5 +1,7 @@
 /* Strong text on quiet surfaces. AA contrast for numerical outputs and tool labels. */
 @layer legibility {
+  .mobile-menu{display:none}
+  @media(max-width:720px){.mobile-menu{display:inline-grid}}
   @media(max-width:720px){.sidebar{visibility:hidden}.sidebar-open .sidebar{visibility:visible}}
   @media(max-width:520px){.hero h1{font-size:clamp(36px,11vw,48px)}.hero-copy{padding-inline:23px}}
   .invalid-estimate{padding:35px}.invalid-estimate h2{margin:22px 0 12px}.invalid-estimate p{font-size:12px;margin-top:10px}
