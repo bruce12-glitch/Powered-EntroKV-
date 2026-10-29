@@ -9,7 +9,7 @@ import json
 import math
 import sys
 
-ENGINE_VERSION = "0.1.0"
+ENGINE_VERSION = "0.2.0"
 EPSILON = 1e-12
 
 

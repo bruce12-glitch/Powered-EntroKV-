@@ -1,10 +1,22 @@
-# Page EntroKV
+# Page EntroKV · v0.2
 
-A browser-local research application for **GQA-aware KV-cache page selection**.
-Explore entropy-weighted pooling, inspect exact retained-page indices, estimate ideal KV payload,
-and export reproducible experiments. No account, GPU, API key, build step, or runtime JavaScript dependencies.
+An open-source research workspace for **GQA-aware KV-cache page selection**. Capture bounded
+Qwen2 attention locally, inspect layers and groups, compare configurations, and preserve complete
+experiments with SHA-256 checksums.
 
-## Run
+**[Open the workspace](https://page-entrokv-lab.coolgoose68.chatgpt.site)** ·
+[Release notes](CHANGELOG.md) · [Capture and data contract](docs/v0.2.md)
+
+## Who it helps
+
+- **KV-cache researchers:** inspect how entropy weighting changes decisions and find failure cases.
+- **Inference engineers:** study quotas and cross-head unions before integrating a serving backend.
+- **Students and contributors:** reproduce the operator without a GPU or hosted inference endpoint.
+
+This release makes selection behavior inspectable. Compressed-generation quality, physical GPU
+savings, throughput, and vLLM compatibility require separate validation.
+
+## Run the website
 
 ```sh
 git clone https://github.com/bruce12-glitch/Powered-EntroKV-.git
@@ -12,119 +24,139 @@ cd Powered-EntroKV-
 python3 -m http.server 8080 --directory dist
 ```
 
-Open `http://localhost:8080` in a modern browser. Use HTTP rather than opening index.html directly,
-because the app uses native JavaScript modules.
+Open `http://localhost:8080`. Native modules and workers require HTTP rather than a file URL.
+SHA-256 exports and project saving require HTTPS or localhost. The website has no build step,
+package installation, runtime JavaScript dependency, or model execution in the browser.
 
-## What's included
+## What's new
 
-- **Overview:** original Notion-inspired workspace and Folio, the hand-drawn page mascot.
-- **Playground:** seeded synthetic observations or strict JSON attention-trace import; sink-isolated Rényi-2 entropy;
-  GQA group pooling; block-max scores; deterministic top-K; mean and independent-head comparisons; page inspector.
-- **Memory planner:** model architecture presets, custom dimensions, page rounding, batch size, and element precision.
-- **Experiment notebook:** browser-local snapshots; full-manifest export and import/recomputation.
-- **Research evidence ledger:** separates conditional theory, manuscript-reported pilot observations, and unmeasured serving claims.
-- **Documentation:** input contract, mathematical definitions, memory assumptions, provenance, privacy, local setup.
-- **Python reference:** `dist/assets/page_entrokv.py`, standard library only, independently cross-checked against the browser operator.
+- **Capture:** a local Qwen2 CLI with CPU/CUDA options, bounded query windows, explicit
+  aggregation/normalization, model revisions, environment metadata, and attention checksums.
+- **Layer Explorer:** layer × KV-group heatmaps, policy overlays, entropy weights, original token
+  inspection, and cancellable background analysis.
+- **Compare:** two configurations on the same input, token Jaccard across different page sizes,
+  common-reference attention-mass diagnostics, and CSV export.
+- **Research projects:** up to 20 complete manifests in local IndexedDB; reopen and recompute.
+- **Full exports:** inputs, configurations, selections, metrics, engine version, release code revision,
+  and SHA-256 integrity verification before import/recomputation.
+
+The single-layer tool, ideal-payload planner, evidence ledger, standard-library Python reference,
+and v0.1 snapshots remain available. The original Notion-inspired design and Folio mascot remain.
+
+## Capture locally
+
+Use Python 3.10+ in an isolated environment. The tested stack is PyTorch 2.8.0,
+Transformers 4.57.3, and NumPy 2.2.6. Choose a PyTorch installation matching your hardware.
+
+```sh
+python -m venv .venv
+# Activate .venv for your operating system.
+# CPU-only installation:
+python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+python -m pip install -r dist/assets/requirements-capture.txt
+
+# Check mechanics without downloading pretrained weights:
+python dist/assets/capture_attention.py --smoke-test --output smoke.json
+
+# Capture a prompt with at least 16 tokens:
+python dist/assets/capture_attention.py \
+  --model Qwen/Qwen2.5-1.5B-Instruct --revision main \
+  --prompt-file dist/assets/example-prompt.txt --output capture.json \
+  --device cpu --dtype float32 --max-tokens 1024 --observation-window 8
+```
+
+Import the file in Layer Explorer. Prefer an immutable model commit SHA instead of `main`.
+Model and tokenizer use the same requested revision; weights download separately and require
+sufficient RAM/VRAM. `trust_remote_code=False` is enforced. The site does not provision compute.
+
+Capture prefills the prefix with SDPA, then collects only the final 1–32 query rows with eager
+attention. It averages per head, explicitly normalizes in Float64, and records raw row-sum errors.
+All layers execute; only requested layers are exported. Truncation keeps the first `--max-tokens`
+tokens and is reported. Existing output files are never overwritten.
+
+`dist/assets/qwen2-smoke.json` is an actual tiny **random-weight** Qwen2 CPU capture. It checks
+mechanics, not pretrained-model quality. The default six-layer demo uses independently seeded
+synthetic observations and is not a model forward pass.
 
 ## Scientific contract
 
-This release is a **numerical reference and research workspace**. It does not load a language model,
-modify a model's KV cache, implement a vLLM plugin, or measure task accuracy, GPU allocation, or throughput.
-The sample trace is synthetic, reproducible from a seed, and explicitly labeled. It is not a capture from Qwen.
-Model presets describe architecture, not validated compression quality or runtime compatibility.
-
-The implementation follows the supplied Page-EntroKV manuscript's sink-isolated entropy weighting,
-raw-attention pooling, and page-max selection. It is newly implemented application code, not a claim
-that the manuscript's original experimental code or raw logs have been independently reproduced.
-
-For each head, entropy is computed on the residual after excluding the first `sink_size` tokens.
-Weights are `softmax(-entropy / tau)` within contiguous GQA groups. The original rows are pooled.
-Page scores are maxima over valid token positions. Retained pages per group:
+Estimate Rényi-2 entropy on each head's normalized residual after excluding the first `sink_size`
+positions. Within contiguous GQA groups, use `softmax(-entropy / tau)` to weight the **original**
+attention rows. Page scores are maxima over valid token positions.
 
 ```text
 K = max(1, floor(ceil(T / block_size) * retention_percent / 100))
 ```
 
-Ties use ascending page index. The one-page floor, page rounding, and actual retention are disclosed.
-Sink isolation does not automatically protect sink pages. Cross-group unions are accounted separately.
-Fixed selection cardinality does not establish physical memory savings or factual accuracy.
+Select exactly K distinct pages per group; ties use ascending page index. The one-page floor,
+rounding, partial pages, and realized retention are disclosed. Sink isolation does not protect
+sink pages automatically. Independent-head unions can exceed K and are over-budget diagnostics.
 
-## Trace format
+Each policy's retained mass is evaluated against the **same arithmetic mean of original sibling
+rows**. It is not answer accuracy. A page mask does not release physical backend storage;
+shared full-head blocks may require a union across groups. The planner estimates ideal KV payload
+under stated compaction assumptions. The supplied manuscript's raw pilot logs are not reproduced.
 
-```json
-{
-  "schema_version": "1.0",
-  "query_heads": 2,
-  "kv_heads": 1,
-  "sink_size": 4,
-  "attention": [
-    [0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625],
-    [0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625]
-  ],
-  "metadata": {"model": "example", "layer": "0"}
-}
-```
+## Formats and limits
 
-One layer / one observation. Query heads must be ordered contiguously within KV groups.
-Rows must be nonnegative finite probabilities summing to 1 within 1e-5. No silent normalization.
-Browser limits: 1–64 heads, 16–8,192 tokens, 262,144 total entries, 8 MiB JSON files.
+- V2 bundles contain 1–128 aligned layer observations, each with an ID, layer index, and v1 trace.
+- Each trace: 1–64 query heads, 16–8,192 tokens, and at most 262,144 attention values.
+- Each bundle: at most 1,048,576 values and 32 MiB JSON. The single-layer importer accepts 8 MiB.
+- Finite nonnegative rows sum to 1 within 1e-5. Browser imports are never silently normalized.
+- Heads are contiguous by KV group; `query_heads` is divisible by `kv_heads`.
+- Retention is in (0,100], page size is an integer in [1,512], and tau is in [0.05,10].
 
-## Python reference
-
-```sh
-python3 dist/assets/page_entrokv.py trace.json --retention 20 --block-size 16 --tau 0.5
-```
-
-Both references use double-precision arithmetic. Float32 GPU implementations may differ near ties.
-The Python CLI outputs selection results; it does not integrate into a serving engine.
+Full manifests include SHA-256 checksums for sanitized input, configuration, and stored results.
+Import verifies these and recomputes the selections. Checksums detect changed content; they do not
+authenticate uploader identity or model provenance. V1 traces and full manifests remain importable.
+See [the complete data/hash contract](docs/v0.2.md).
 
 ## Verify
 
 ```sh
 npm test
+# After installing the optional capture requirements:
+python -B -m unittest discover -s tests -p test_capture.py -v
 ```
 
-Uses Node's built-in test runner (Node 20+), with Python 3.10+ for numerical parity.
-Tests cover deterministic fixtures, normalization, entropy closed forms, all-sink guards,
-stable ties, partial pages, exact quotas, union bounds, invalid inputs, memory arithmetic,
-and Python/JavaScript parity. No dependency installation is required.
+Node 20+ and Python 3.10+ suffice for the dependency-free numerical suite: analytical cases,
+quotas, ties, partial pages, union bounds, memory arithmetic, Python/JavaScript operator and binary
+hash parity, alignment, common-reference metrics, token overlap, manifests, tampering, and CSV safety.
 
-## Storage and exports
+The capture integration suite uses a tiny random-weight Qwen2 CPU model. It compares bounded
+SDPA-prefix observations against full eager last-query attention (`rtol=1e-5`, `atol=1e-7`).
+Pretrained CUDA capture and serving performance have not been validated by this release.
 
-Attention imports never leave the browser. Full traces remain in memory only.
-Up to 50 selection snapshots are stored in localStorage, specific to the current browser and origin.
-Save full JSON manifests before closing a session if the original imported data must be retained.
-The FNV-1a fingerprint is a change identifier, not a cryptographic checksum.
-The application uses no analytics, external fonts, or remote scripts.
+## Storage and privacy
 
-## Design and assets
+Imports are analyzed locally and are not uploaded by the application. Save project stores full
+inputs and optional token text in IndexedDB only when requested. Storage can be cleared and is
+specific to the current browser/origin; download full manifests for durable records. Up to 50
+legacy snapshots remain in localStorage; their FNV-1a identifiers are not cryptographic checksums.
+There are no analytics, external fonts, or remote runtime scripts.
 
-The interface uses an original Notion-inspired editorial direction: warm neutrals, purple controls,
-pastel tool surfaces, structured tables, focus states, responsive navigation, and reduced-motion support.
-It is not affiliated with Notion. Folio is original AI-generated artwork made for this project.
-Asset recipe: friendly paper-stack scholar, black ink contours, round glasses, purple cap/scarf,
-warm paper backdrop, restrained lavender/yellow details. Optimized asset: `dist/assets/folio.webp`.
+The capture CLI may contact Hugging Face for assets. Token IDs are included by default and can
+reveal prompt content; decoded text is opt-in. Avoid publishing private captures unintentionally.
 
-## Research sources
+## Design and attribution
 
-- Supplied manuscript: Inbasekaran S., *Page-EntroKV: Hardware-Aligned, Entropy-Weighted KV-Cache Eviction under Grouped-Query Attention*.
-  Venue, DOI, and publication date are intentionally unspecified. Raw manuscript experiment logs are not bundled.
+Original warm editorial design inspired by Notion; not affiliated with Notion. Folio is original
+AI-generated artwork, optimized at `dist/assets/folio.webp`.
+
+- Inbasekaran S., *Page-EntroKV: Hardware-Aligned, Entropy-Weighted KV-Cache Eviction under
+  Grouped-Query Attention*, supplied manuscript. No venue, DOI, or publication date is asserted.
 - [Qwen2.5-1.5B configuration](https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct/blob/main/config.json)
-- [Qwen2.5-7B configuration](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/config.json)
-- [vLLM PagedAttention design](https://docs.vllm.ai/en/latest/design/paged_attention/)
+- [Transformers attention interface](https://huggingface.co/docs/transformers/attention_interface)
+- [Historical vLLM PagedAttention explainer](https://docs.vllm.ai/en/latest/design/paged_attention/):
+  background only; integration must inspect a pinned current backend.
 
-## Contributing
+## Contributing and next milestones
 
-Open an issue with the exact input schema, configuration, expected result, and engine version.
-Do not include sensitive attention traces or private source text. For numerical changes, add
-an independent invariant, known analytical case, or reference comparison. Serving integration
-must be benchmarked separately from selection analysis.
+Open issues with the input schema, configuration, engine version, and expected behavior. Numerical
+changes need an independent invariant, analytical case, or reference comparison. Use public fixtures.
 
-## Roadmap
+Next: matched compressed-generation evaluation, position-preserving cache mutation, then a pinned
+serving adapter measuring physical allocation, peak overhead, quality, latency, and concurrency.
+Those are separate from v0.2 observation analysis.
 
-1. Validate imported real-model observations and matched downstream baselines.
-2. Benchmark the policy in a compressed-cache generation adapter.
-3. Integrate backend allocation and position-aware attention.
-4. Measure physical memory, peak overhead, quality, latency, and concurrency.
-
-MIT license. Original research attribution is retained in the reference documentation.
+MIT license. Original research attribution is retained.

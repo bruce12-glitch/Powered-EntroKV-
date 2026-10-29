@@ -1,0 +1,12 @@
+const DATABASE='page-entrokv-projects',VERSION=1,STORE='projects';
+function open(){return new Promise((resolve,reject)=>{const request=indexedDB.open(DATABASE,VERSION);request.onupgradeneeded=()=>{request.result.createObjectStore(STORE,{keyPath:'id'});};request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(new Error('This browser did not allow local project storage. Export your full manifest instead.'));request.onblocked=()=>reject(new Error('Close other workspace tabs to update local storage.'));});}
+export async function saveProject(project){
+  const db=await open();return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,'readwrite'),store=tx.objectStore(STORE),request=store.count();
+    request.onsuccess=()=>{if(request.result>=20){tx.abort();reject(new Error('The local library holds 20 projects. Export and remove an old project first.'));return;}store.put(project);};
+    tx.oncomplete=()=>{db.close();resolve(project.id);};tx.onerror=()=>{db.close();reject(new Error('Could not save the full project, possibly because browser storage is full. Export a manifest to preserve it.'));};tx.onabort=()=>db.close();
+  });
+}
+export async function listProjects(){const db=await open();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readonly'),request=tx.objectStore(STORE).openCursor(),items=[];request.onsuccess=()=>{const cursor=request.result;if(cursor){const p=cursor.value;items.push({id:p.id,name:p.name,created_at:p.created_at,observations:p.input.observations.length,source:p.input.source,configurations:p.configs.length});cursor.continue();}};tx.oncomplete=()=>{db.close();resolve(items.sort((a,b)=>b.created_at.localeCompare(a.created_at)));};tx.onerror=()=>{db.close();reject(new Error('Could not read local projects.'));};});}
+export async function getProject(id){const db=await open();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readonly'),request=tx.objectStore(STORE).get(id);request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(new Error('Could not open this project.'));tx.oncomplete=()=>db.close();});}
+export async function removeProject(id){const db=await open();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(id);tx.oncomplete=()=>{db.close();resolve();};tx.onerror=()=>{db.close();reject(new Error('Could not remove the local project.'));};});}

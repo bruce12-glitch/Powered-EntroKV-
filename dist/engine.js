@@ -1,5 +1,5 @@
 /* Page EntroKV reference operators. Float64 JavaScript arithmetic; no model inference. */
-export const ENGINE_VERSION = '0.1.0';
+export const ENGINE_VERSION = '0.2.0';
 export const EPSILON = 1e-12;
 export const MAX_TRACE_ENTRIES = 262144;
 

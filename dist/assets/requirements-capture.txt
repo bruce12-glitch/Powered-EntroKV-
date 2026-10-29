@@ -1,0 +1,4 @@
+# Tested reference environment. Install the CPU PyTorch wheel separately if preferred.
+torch==2.8.0
+transformers==4.57.3
+numpy==2.2.6
