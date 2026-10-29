@@ -28,6 +28,8 @@ Open `http://localhost:8080`. Native modules and workers require HTTP rather tha
 SHA-256 exports and project saving require HTTPS or localhost. The website has no build step,
 package installation, runtime JavaScript dependency, or model execution in the browser.
 
+Direct Link : https://page-entrokv-lab.coolgoose68.chatgpt.site/
+
 ## What's new
 
 - **Capture:** a local Qwen2 CLI with CPU/CUDA options, bounded query windows, explicit
